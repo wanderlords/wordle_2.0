@@ -21,8 +21,8 @@
             --text-color: #1a202c;
             --modal-bg: rgba(245, 247, 250, 0.9);
             --header-bg: rgba(245, 247, 250, 0.9);
-            --shadow-color-light: rgba(0, 0, 0, 0.1);
-            --shadow-color-dark: rgba(255, 255, 255, 0.7);
+            --shadow-color-light: rgba(0, 0, 0, 0.08);
+            --shadow-color-dark: rgba(255, 255, 255, 0.9);
             --text-color-secondary: #718096;
             
             /* Плитки и клавиатура (Светлая тема) */
@@ -64,7 +64,6 @@
         #app { width: 100%; height: 100%; max-width: 500px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding-bottom: constant(safe-area-inset-bottom); padding-bottom: env(safe-area-inset-bottom); }
         .hidden { display: none !important; }
 
-        /* --- Новая структура главного меню --- */
         #main-menu {
             display: flex;
             flex-direction: column;
@@ -77,7 +76,8 @@
             gap: 20px;
         }
         #logo-container { text-align: center; }
-        #logo-container h1 { font-size: 3.5rem; font-weight: 700; letter-spacing: 0.1em; }
+        /* Адаптивный заголовок */
+        #logo-container h1 { font-size: clamp(2.8rem, 12vw, 3.5rem); font-weight: 700; letter-spacing: 0.1em; }
         #logo-container p { font-size: 1.2rem; color: var(--text-color-secondary); margin-top: -10px;}
         
         .play-button {
@@ -98,7 +98,6 @@
             box-shadow: inset -5px -5px 10px var(--shadow-color-dark), inset 5px 5px 10px var(--shadow-color-light);
         }
         
-        /* --- Новые текстовые кнопки меню --- */
         #menu-actions {
             display: flex;
             flex-direction: column;
@@ -144,7 +143,8 @@
         .icon-menu-button svg {
             width: 28px;
             height: 28px;
-            stroke: var(--text-color-secondary);
+            /* Исправленный цвет иконки звука */
+            stroke: var(--text-color);
             stroke-width: 2;
         }
         #menu-footer { position: absolute; bottom: 30px; display: flex; gap: 20px; align-items: center;}
@@ -168,6 +168,7 @@
         #game-board-container { display: flex; justify-content: center; align-items: center; flex-grow: 1; overflow: hidden; width: 100%; padding: 5px; }
         #game-board { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; max-width: 100%; max-height: 100%; }
         .board-row { display: grid; gap: 5px; }
+        /* Улучшенная текстура ячеек */
         .tile {
             display: inline-flex;
             justify-content: center;
@@ -179,7 +180,7 @@
             transition: transform 0.4s, background-color 0.4s, box-shadow 0.4s;
             transform-style: preserve-3d;
             border-radius: 10px;
-            box-shadow: inset -2px -2px 5px var(--shadow-color-dark), inset 2px 2px 5px var(--shadow-color-light);
+            box-shadow: inset -3px -3px 6px var(--shadow-color-dark), inset 3px 3px 6px var(--shadow-color-light);
             border:none;
         }
         .tile.filled { transform: scale(1.05); }
@@ -251,10 +252,8 @@
             100% { transform: translate(-50%, -20px); opacity: 0; }
         }
 
-        /* Новый селектор длины слова */
         #length-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
 
-        /* Новая таблица статистики */
         .stats-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 1rem; }
         .stats-table th, .stats-table td { padding: 12px 10px; text-align: center; }
         .stats-table thead { border-bottom: 2px solid var(--tile-border-color); }
@@ -4408,14 +4407,27 @@
                     showFriendScreen('display'); 
                 } else { showToast('Ошибка при создании ссылки'); }
             });
+
+            // ИСПРАВЛЕНА ЛОГИКА ОТПРАВКИ
             sendToFriendBtn.addEventListener('click', async () => {
                 const code = generatedCodeDisplay.textContent;
                 if (!code) return;
                 try {
                     const shareLink = `https://vk.com/app${APP_ID}#${code}`;
-                    await vkBridge.send('VKWebAppShare', { link: `${shareLink}\n\nЯ загадал тебе слово! Попробуй угадать :)` });
-                } catch(e) { showToast('Ошибка при отправке'); }
+                    // VK Bridge ожидает, что ссылка будет в параметре `link`
+                    await vkBridge.send('VKWebAppShare', { 'link': shareLink });
+                } catch(e) {
+                    // Если возникает ошибка (например, в десктопной версии),
+                    // предлагаем скопировать ссылку вручную
+                    try {
+                         await navigator.clipboard.writeText(`Я загадал тебе слово! Попробуй угадать :)\nhttps://vk.com/app${APP_ID}#${code}`);
+                         showToast('Ссылка скопирована!');
+                    } catch (copyError) {
+                         showToast('Ошибка при отправке');
+                    }
+                }
             });
+
             backToMainMenuBtn.addEventListener('click', showMainMenu);
             backToCreateViewBtn.addEventListener('click', () => showFriendScreen('create'));
 
