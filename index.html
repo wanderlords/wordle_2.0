@@ -4408,23 +4408,21 @@
                 } else { showToast('Ошибка при создании ссылки'); }
             });
 
-            // ИСПРАВЛЕНА ЛОГИКА ОТПРАВКИ
+            // ИЗМЕНЕНО: Возвращена рабочая механика отправки с текстом
             sendToFriendBtn.addEventListener('click', async () => {
                 const code = generatedCodeDisplay.textContent;
                 if (!code) return;
+                const shareLink = `https://vk.com/app${APP_ID}#${code}`;
+                const message = 'Я загадал для тебя слово! Попробуй отгадать его в «Словозавр».';
+                
                 try {
-                    const shareLink = `https://vk.com/app${APP_ID}#${code}`;
-                    // VK Bridge ожидает, что ссылка будет в параметре `link`
-                    await vkBridge.send('VKWebAppShare', { 'link': shareLink });
+                    await vkBridge.send('VKWebAppShare', { 
+                        link: shareLink,
+                        text: message
+                    });
                 } catch(e) {
-                    // Если возникает ошибка (например, в десктопной версии),
-                    // предлагаем скопировать ссылку вручную
-                    try {
-                         await navigator.clipboard.writeText(`Я загадал тебе слово! Попробуй угадать :)\nhttps://vk.com/app${APP_ID}#${code}`);
-                         showToast('Ссылка скопирована!');
-                    } catch (copyError) {
-                         showToast('Ошибка при отправке');
-                    }
+                    showToast('Ошибка при отправке');
+                    console.error("Share error:", e);
                 }
             });
 
