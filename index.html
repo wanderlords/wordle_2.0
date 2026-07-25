@@ -98,11 +98,33 @@
             box-shadow: inset -5px -5px 10px var(--shadow-color-dark), inset 5px 5px 10px var(--shadow-color-light);
         }
         
+        /* --- Новые текстовые кнопки меню --- */
         #menu-actions {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            gap: 15px;
             margin-top: 20px;
+            width: 100%;
+            max-width: 280px;
         }
+        .text-menu-button {
+             background: var(--bg-color);
+            color: var(--text-color-secondary);
+            font-family: var(--font-family);
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: -5px -5px 10px var(--shadow-color-dark), 5px 5px 10px var(--shadow-color-light);
+            transition: all 0.2s ease-in-out;
+        }
+        .text-menu-button:active {
+             box-shadow: inset -5px -5px 10px var(--shadow-color-dark), inset 5px 5px 10px var(--shadow-color-light);
+        }
+
         .icon-menu-button {
             background: var(--bg-color);
             border: none;
@@ -139,8 +161,10 @@
         #game-screen { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 5px; position: relative; z-index: 10; width: 100%; flex-shrink: 0; backdrop-filter: blur(5px); background-color: var(--header-bg); }
         header h2 { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 1.5rem; font-weight: 700; letter-spacing: 0.1em; text-align: center; pointer-events: none; }
-        .icon-button { background: none; border: none; cursor: pointer; width: 48px; height: 48px; display: flex; justify-content: center; align-items: center; color: var(--text-color); }
+        .icon-button { background: none; border: none; cursor: pointer; width: 48px; height: 48px; display: flex; justify-content: center; align-items: center; color: var(--text-color); font-size: 24px; position: relative; }
         .icon-button svg { width: 28px; height: 28px; stroke: var(--text-color); }
+        .ad-badge { position: absolute; top: 6px; right: 0px; background-color: var(--color-correct); color: white; padding: 1px 4px; border-radius: 4px; font-size: 9px; font-weight: 700; line-height: 1; }
+
         #game-board-container { display: flex; justify-content: center; align-items: center; flex-grow: 1; overflow: hidden; width: 100%; padding: 5px; }
         #game-board { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; max-width: 100%; max-height: 100%; }
         .board-row { display: grid; gap: 5px; }
@@ -213,7 +237,6 @@
         .primary { background-color: var(--color-correct); color: var(--color-text-light); }
         .secondary { background-color: var(--bg-color); color: var(--text-color); }
         
-        /* Новое окно победы */
         #win-stats { text-align: left; margin: 20px 0; }
         .win-stat-item { display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; padding: 10px 0; border-bottom: 1px solid var(--tile-border-color);}
         .win-stat-item:last-child { border-bottom: none; }
@@ -227,6 +250,18 @@
             15%, 85% { transform: translate(-50%, 0); opacity: 1; }
             100% { transform: translate(-50%, -20px); opacity: 0; }
         }
+
+        /* Новый селектор длины слова */
+        #length-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+
+        /* Новая таблица статистики */
+        .stats-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 1rem; }
+        .stats-table th, .stats-table td { padding: 12px 10px; text-align: center; }
+        .stats-table thead { border-bottom: 2px solid var(--tile-border-color); }
+        .stats-table th { font-weight: 700; color: var(--text-color-secondary); }
+        .stats-table td { font-weight: 700; }
+        .stats-table tbody tr:not(:last-child) { border-bottom: 1px solid var(--tile-border-color); }
+
     </style>
 </head>
 <body>
@@ -240,24 +275,18 @@
             </div>
             <button class="play-button" id="play-game-btn">ИГРАТЬ</button>
             <div id="menu-actions">
-                <button id="friend-mode-btn" class="icon-menu-button" title="Слово другу">
-                    <svg fill="none" viewBox="0 0 24 24"><path d="M20 4L3 11L10 14M20 4L13 21L10 14M20 4L10 14" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <button id="stats-button" class="icon-menu-button" title="Статистика">
-                     <svg fill="none" viewBox="0 0 24 24"><path d="M16 16V12M12 16V8M8 16V14M21.5 12C21.5 17.2467 17.2467 21.5 12 21.5C6.75329 21.5 2.5 17.2467 2.5 12C2.5 6.75329 6.75329 2.5 12 2.5C17.2467 2.5 21.5 6.75329 21.5 12Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <button id="rules-button" class="icon-menu-button" title="Правила">
-                    <svg fill="none" viewBox="0 0 24 24"><path d="M12 16V12M12 8H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
+                 <button id="friend-mode-btn" class="text-menu-button">Слово другу</button>
+                 <button id="stats-button" class="text-menu-button">Статистика</button>
+                 <button id="rules-button" class="text-menu-button">Правила</button>
             </div>
              <div id="menu-footer">
                 <button id="sound-toggle-btn" class="icon-menu-button">
-                    <svg id="sound-on-icon" viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2V15H6L11 19V5Z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15.54 8.46C16.4774 9.39764 17.0042 10.6695 17.0042 12.005C17.0042 13.3405 16.4774 14.6124 15.54 15.55" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                    <svg id="sound-off-icon" class="hidden" viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2V15H6L11 19V5Z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M21 15L17 9" stroke-linecap="round" stroke-linejoin="round"></path><path d="M17 15L21 9" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                    <svg id="sound-on-icon" viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2V15H6L11 19V5Z" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"></path><path d="M15.54 8.46C16.4774 9.39764 17.0042 10.6695 17.0042 12.005C17.0042 13.3405 16.4774 14.6124 15.54 15.55" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"></path></svg>
+                    <svg id="sound-off-icon" class="hidden" viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2V15H6L11 19V5Z" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"></path><path d="M21 15L17 9" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"></path><path d="M17 15L21 9" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"></path></svg>
                 </button>
                 <button id="theme-toggle-btn" class="icon-menu-button">
-                    <svg id="theme-sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg id="theme-moon-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg id="theme-sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg id="theme-moon-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
         </div>
@@ -285,9 +314,7 @@
                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
                 </button>
                 <h2 id="game-title">5 БУКВ</h2>
-                <button id="hint-button" class="icon-button">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18s-1-3.5 0-5.5 3-4 5-5M12 15l-3-3m5.5-5.5a3 3 0 11-4.24-4.24 3 3 0 014.24 4.24z"/></svg>
-                </button>
+                <button id="hint-button" class="icon-button">💡<span class="ad-badge">AD</span></button>
             </header>
             <div id="game-board-container">
                 <div id="game-board"></div>
@@ -341,8 +368,11 @@
         <div id="length-select-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <h3>Длина слова</h3>
-                <div class="modal-buttons" id="length-selector">
+                <div id="length-selector">
                     <!-- Кнопки выбора длины будут здесь -->
+                </div>
+                 <div class="modal-buttons">
+                    <button id="back-from-length-select" class="modal-button secondary">Назад</button>
                 </div>
             </div>
         </div>
@@ -3828,6 +3858,7 @@
         const gameBoard = document.getElementById('game-board');
         const keyboardContainer = document.getElementById('keyboard');
         const toast = document.getElementById('toast');
+        const hintButton = document.getElementById('hint-button');
         // Main Menu
         const playGameBtn = document.getElementById('play-game-btn');
         const friendModeBtn = document.getElementById('friend-mode-btn');
@@ -3900,7 +3931,7 @@
                 Tone.Master.mute = isMuted;
                 if (isMuted) {
                     bgMusic.pause();
-                } else if (!gameScreen.classList.contains('hidden')) {
+                } else if (!mainMenu.classList.contains('hidden') || !gameScreen.classList.contains('hidden')) {
                     bgMusic.play().catch(e => {});
                 }
                 saveData();
@@ -4100,7 +4131,6 @@
                 const tile = getTile(currentRowIndex, firstEmptyIndex);
                 tile.textContent = letter;
                 tile.classList.add('filled');
-                // BUG FIX: Ensure placeholder class is removed when typing
                 tile.classList.remove('placeholder'); 
                 tile.style.animation = 'pop 0.2s ease';
             }
@@ -4179,6 +4209,32 @@
                     tile.textContent = correctLetterPositions[i];
                     tile.classList.add('placeholder');
                 }
+            }
+        }
+
+        async function handleHint() {
+            if (isGameOver || isProcessing) return;
+            try {
+                const adStatus = await vkBridge.send('VKWebAppCheckNativeAds', { ad_format: 'reward' });
+                if (adStatus.result) {
+                    const adResult = await vkBridge.send('VKWebAppShowNativeAds', { ad_format: 'reward' });
+                    if (adResult.result) {
+                        let hintPlaced = false;
+                        for (let i = 0; i < wordLength; i++) {
+                            const tile = getTile(currentRowIndex, i);
+                            if (!tile.textContent) {
+                                tile.textContent = secretWord[i];
+                                tile.classList.add('placeholder');
+                                hintPlaced = true;
+                                break; 
+                            }
+                        }
+                        if (!hintPlaced) { showToast('Ряд заполнен, подсказка невозможна'); }
+                    } else { showToast('Просмотрите рекламу до конца'); }
+                } else { showToast('Подсказка пока недоступна'); }
+            } catch (error) {
+                console.error('Rewarded ad error:', error);
+                showToast('Ошибка при показе рекламы');
             }
         }
 
@@ -4300,23 +4356,29 @@
         }
 
         function renderStatsModal() {
-            statsModal.innerHTML = ''; // Clear previous content
+            statsModal.innerHTML = ''; 
             const modalContent = document.createElement('div');
             modalContent.className = 'modal-content';
             
-            let html = `<h3>Статистика</h3><div class="modal-body" style="text-align: center;">`;
+            let html = `<h3>Статистика</h3><div class="modal-body">`;
             const availableLengths = Object.keys(guessableWordsData.words);
             let hasStats = false;
+
+            let tableHtml = `<table class="stats-table"><thead><tr><th>Режим</th><th>Побед</th><th>Всего</th><th>%</th></tr></thead><tbody>`;
+
             availableLengths.forEach(len => {
                 const s = stats[len];
                 if (s && s.played > 0) {
                     hasStats = true;
                     const winRate = Math.round((s.wins / s.played) * 100);
-                    html += `<p><b>${len} ${getPluralizedLetters(len)}:</b> ${s.wins} из ${s.played} побед (${winRate}%)</p>`;
+                    tableHtml += `<tr><td>${len} ${getPluralizedLetters(len)}</td><td>${s.wins}</td><td>${s.played}</td><td>${winRate}%</td></tr>`;
                 }
             });
-
-            if (!hasStats) {
+            tableHtml += `</tbody></table>`;
+            
+            if (hasStats) {
+                html += tableHtml;
+            } else {
                 html += `<p>Вы еще не сыграли ни одной игры!</p>`;
             }
             
@@ -4334,11 +4396,8 @@
             statsButton.addEventListener('click', renderStatsModal);
             rulesButton.addEventListener('click', () => rulesModal.classList.remove('hidden'));
             document.getElementById('close-rules-btn').onclick = () => rulesModal.classList.add('hidden');
-            document.querySelector('#length-select-modal .modal-content').addEventListener('click', (e) => {
-                 if(e.target === e.currentTarget.parentElement) lengthSelectModal.classList.add('hidden');
-            });
+            document.getElementById('back-from-length-select').onclick = () => lengthSelectModal.classList.add('hidden');
             
-            // Friend Mode Logic
             generateCodeBtn.addEventListener('click', () => {
                 let word = wordToCreateInput.value.trim().toLowerCase();
                 if (word.length < 4 || word.length > 11) { showToast('Слово от 4 до 11 букв'); return; }
@@ -4354,14 +4413,12 @@
                 if (!code) return;
                 try {
                     const shareLink = `https://vk.com/app${APP_ID}#${code}`;
-                    // Добавляем текст к ссылке
                     await vkBridge.send('VKWebAppShare', { link: `${shareLink}\n\nЯ загадал тебе слово! Попробуй угадать :)` });
                 } catch(e) { showToast('Ошибка при отправке'); }
             });
             backToMainMenuBtn.addEventListener('click', showMainMenu);
             backToCreateViewBtn.addEventListener('click', () => showFriendScreen('create'));
 
-            // Keyboard
             let activeKey = null;
             const handlePressStart = (e) => { 
                 const keyEl = e.target.closest('.key');
@@ -4382,22 +4439,17 @@
             keyboardContainer.addEventListener('touchend', (e) => { e.preventDefault(); handlePressEnd(e); }, { passive: false });
             document.addEventListener('keydown', e => { if (!gameScreen.classList.contains('hidden')) { handleKeyPress(e.key); } });
 
-            // In-game buttons
             document.getElementById('back-to-menu-from-game-btn').addEventListener('click', showMainMenu);
-            document.getElementById('hint-button').addEventListener('click', () => showToast('Подсказки в разработке!'));
+            hintButton.addEventListener('click', handleHint);
             
-            // Endgame buttons
             newGameButton.addEventListener('click', () => { endgameModal.classList.add('hidden'); openLengthSelector(); });
             backToMenuFromEndgameBtn.addEventListener('click', () => { endgameModal.classList.add('hidden'); showMainMenu(); });
             
-            // Sound & Theme
             soundToggleBtn.addEventListener('click', () => audioManager.toggleMute());
             themeToggleBtn.addEventListener('click', toggleTheme);
 
-            // Audio initialization on first interaction
             document.body.addEventListener('click', async () => { if (!audioManager.isReady) { await Tone.start(); audioManager.init(); audioManager.toggleMute(isMuted); }}, { once: true });
             
-            // Handle app visibility for music
             vkBridge.subscribe(e => {
                 if (e.detail.type === 'VKWebAppViewHide') { if (!bgMusic.paused) { wasMusicPlaying = true; bgMusic.pause(); }}
                 if (e.detail.type === 'VKWebAppViewRestore') { if (wasMusicPlaying && !isMuted) { bgMusic.play().catch(e => {}); } wasMusicPlaying = false; }
